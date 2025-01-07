@@ -28,6 +28,8 @@ where N is the standard normal cumulative distribution function and:
 
 $$d_{+}=\frac{1}{\sigma\sqrt{T-t}}\[ln\(\frac{S_{t}}{E}\)+\( r+\frac{1}{2}\sigma^{2} \) (T-t) \] $$
 
+$$d_{-} = d_{+} - \sigma\sqrt{T-t}$$
+
 **Method 2: transform to head equation and use forward Euler**
 
 
