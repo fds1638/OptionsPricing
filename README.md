@@ -58,7 +58,7 @@ $$u(x,\tau) \rightarrow 0 \text{ as } \tau \rightarrow -\infty$$
 
 $$u(x,\tau) \rightarrow e^{-\alpha x}e^{-\beta\tau}(e^{x}-e^{-2r\tau /\sigma^{2}}) \text{ as } \tau \rightarrow \infty$$
 
-$$u(x, 0) = e^{-\alpha x}(e^{x}-1)$$
+$$u(x, 0) = e^{-\alpha x}\dot max(0, e^{x}-1)$$
 
 This system of equations is solved with forward Euler.
 
