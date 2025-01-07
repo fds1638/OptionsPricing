@@ -22,7 +22,7 @@ $$V(S, T) = max(0, S - E)$$
 
 **Method 1: Closed form**
 
-$$V(S,t) = N(d_{+})S_{t}-N(d_{-})Ee^{-r(T-t)}$$
+$$V(S,t) = N(d_{+})S-N(d_{-})Ee^{-r(T-t)}$$
 
 where N is the standard normal cumulative distribution function and:
 
@@ -30,7 +30,19 @@ $$d_{+}=\frac{1}{\sigma\sqrt{T-t}}\[ln\(\frac{S_{t}}{E}\)+\( r+\frac{1}{2}\sigma
 
 $$d_{-} = d_{+} - \sigma\sqrt{T-t}$$
 
-**Method 2: transform to head equation and use forward Euler**
+**Method 2: transform to heat equation and use forward Euler**
+
+Use the following transformations:
+
+$$S = Ee^{x}$$
+
+$$\tau = \frac{\sigma^2}{2}(T-t)$$
+
+$$u(x, \tau) = Ee^{\alpha x}e^{\beta \tau}V(S,t)$$
+
+where:
+
+$$\alpha = -\frac{1}{2}\left($$
 
 
-**Method 3: transform to head equation and use backward Euler**
+**Method 3: transform to heat equation and use backward Euler**
