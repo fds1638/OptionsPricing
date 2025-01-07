@@ -70,6 +70,6 @@ The same heat equation and initial and boundary condition system of equations is
 
 With $\sigma=0.1$, $r=0.05$, $E=50$, and exercise date at $T=50$:
 
-![alt text](./closed_fe_be.png, raw=true)
+![alt text](/closed_fe_be.png, raw=true)
 
 
