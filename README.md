@@ -2,6 +2,10 @@
 
 Repo doing options pricing following Wilmott et. al.
 
+**To Run**
+
+Run main.py, which will run all three solutions below.
+
 **Purpose:**
 
 Solve the Black-Scholes equation below in three different ways:
