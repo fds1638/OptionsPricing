@@ -65,3 +65,9 @@ This system of equations is solved with forward Euler.
 **Method 3: transform to heat equation and use backward Euler**
 
 The same heat equation and initial and boundary condition system of equations is solved with backwards Euler.
+
+**Result**
+
+With $\sigma=0.1$, $r=0.05$, $E=50$, and exercise date at $T=50$:
+
+![alt text](./closed_fe_be.png)
