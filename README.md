@@ -42,7 +42,7 @@ $$u(x, \tau) = Ee^{\alpha x}e^{\beta \tau}V(S,t)$$
 
 where:
 
-$$\alpha = -\frac{1}{2}\left($$
+$$\alpha = -\frac{1}{2}\left( \frac{2r}{\sigma^2}-1\right)$$
 
 
 **Method 3: transform to heat equation and use backward Euler**
