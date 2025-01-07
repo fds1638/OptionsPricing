@@ -22,6 +22,12 @@ $$V(S, T) = max(0, S - E)$$
 
 **Method 1: Closed form**
 
+$$V(S,t) = N(d_{+})S_{t}-N(d_{-})Ee^{-r(T-t)}$$
+
+where N is the standard normal cumulative distribution function and:
+
+$$d_{+}=\frac{1}{\sigma\sqrt{T-t}}\[ln\left\frac{S_{t}}{E}\right+\left r+\frac{1}{2}\sigma^{2} \right (T-t) \] $$
+
 **Method 2: transform to head equation and use forward Euler**
 
 
