@@ -52,7 +52,7 @@ $$u_{\tau}=u_{xx}$$
 
 $$u(x,\tau) \rightarrow 0 \text{ as } \tau \rightarrow -\infty$$
 
-$$u(x,\tau) \rightarrow e^{-\alpha x}e^{-\beta\tau}(e^{x}-e^{-2r\tau /sigma^{2}}) \text{ as } \tau \rightarrow \infty$$
+$$u(x,\tau) \rightarrow e^{-\alpha x}e^{-\beta\tau}(e^{x}-e^{-2r\tau /\sigma^{2}}) \text{ as } \tau \rightarrow \infty$$
 
 $$u(x, 0) = e^{-\alpha x}(e^{x}-1)$$
 
