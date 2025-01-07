@@ -16,7 +16,7 @@ Solve for a European call option with exercise price $E$, which leads to the fol
 
 $$V(0, t) = 0$$
 
-$$V(S, t) \rightarrow S - Ee^{r(T-t)} as S \rightarrow \infty$$
+$$V(S, t) \rightarrow S - Ee^{r(T-t)} \text{  as  } S \rightarrow \infty$$
 
 $$V(S, T) = max(0, S - E)$$
 
