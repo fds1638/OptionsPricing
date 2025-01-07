@@ -44,5 +44,20 @@ where:
 
 $$\alpha = -\frac{1}{2}\left( \frac{2r}{\sigma^2}-1\right)$$
 
+$$\beta = -\frac{1}{4}\left( \frac{2r}{\sigma^2}+1\right)^{2}$$
+
+yields the following heat equation and boundary conditions:
+
+$$u_{\tau}=u_{xx}$$
+
+$$u(x,\tau) \rightarrow 0 \text{ as } \tau \rightarrow -\infty$$
+
+$$u(x,\tau) \rightarrow e^{-\alpha x}e^{-\beta\tau}(e^{x}-e^{-2r\tau /sigma^{2}}) \text{ as } \tau \rightarrow \infty$$
+
+$$u(x, 0) = e^{-\alpha x}(e^{x}-1)$$
+
+This system of equations is solved with forward Euler.
 
 **Method 3: transform to heat equation and use backward Euler**
+
+The same heat equation and initial and boundary condition system of equations is solved with backwards Euler.
