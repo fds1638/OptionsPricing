@@ -4,6 +4,7 @@ from Black_Scholes_closed_form_02 import BlackScholesCallValue
 from forward_euler import forward_euler
 from implicit import backward_euler
 from greeks import delta
+from binomial import get_binary_value
 
 if __name__ == '__main__':
     # stock and option parameters
@@ -29,14 +30,23 @@ if __name__ == '__main__':
     implicit_S, implicit_V = backward_euler(r, sigma, E, 0, 100)
     plt.plot(implicit_S, implicit_V)
 
+    # binomial tree solution
+    bin_S = [i for i in range(1, 2 * E + 1)]
+    bin_V = []
+    for ii in range(len(bin_S)):
+        bin_V.append(
+            get_binary_value(r, sigma, bin_S[ii], E, 45, 50, 500, "call")
+        )
+    plt.plot(bin_S, bin_V)
+
     # plot
-    plt.legend(["Exact t=" + str(t_value) for t_value in t_values] + ["FE t=45"] + ["BE t=45"])
+    plt.legend(["Exact t=" + str(t_value) for t_value in t_values] + ["FE t=45"] + ["BE t=45"] + ["binomial t=45"])
     plt.show()
 
 
-    x_delta, y_delta = delta(S_values, call_values)
-    plt.plot(x_delta, y_delta)
-    plt.legend(["Delta of Exact t=45"])
-    plt.show()
+    # x_delta, y_delta = delta(S_values, call_values)
+    # plt.plot(x_delta, y_delta)
+    # plt.legend(["Delta of Exact t=45"])
+    # plt.show()
 
 
