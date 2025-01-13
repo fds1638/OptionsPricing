@@ -20,6 +20,18 @@ def BlackScholesCallValue(S_array, D, t, T, E, sigma, r):
             retval.append(max(0, S - E))
     return retval
 
+def BlackScholesPutValue(S_array, D, t, T, E, sigma, r):
+    """Closed form Black Scholes value for a call, following Wilmott."""
+    retval = []
+    for S in S_array:
+        if T - t > 0:
+            d1 = (math.log(S/E) + (r - D + 1/2 * sigma * sigma)*(T - t)) / (sigma * math.sqrt(T - t))
+            d2 = d1 - sigma * math.sqrt(T - t)
+            retval.append(-S * math.exp(-D * (T - t)) * norm.cdf(-d1) + E * math.exp(-r * (T - t)) * norm.cdf(-d2))
+        else:
+            retval.append(max(0, E - S))
+    return retval
+
 if __name__ == '__main__':
     """Black Scholes closed form example, following Wilmott."""
 
@@ -28,6 +40,6 @@ if __name__ == '__main__':
     S_values = np.linspace(1, 100, 990)
     t_values = [30, 40, 45, 49, 50]
     for t in t_values:
-        plt.plot(S_values, BlackScholesCallValue(S_values, 0, t, 50, 50, sigma, 0.05))
+        plt.plot(S_values, BlackScholesPutValue(S_values, 0, t, 50, 50, sigma, 0.05))
     plt.legend(t_values)
     plt.show()

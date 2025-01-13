@@ -23,7 +23,7 @@ if __name__ == '__main__':
             call_values = call_values_t.copy()
 
     # forward euler solution
-    heat_S, heat_V = forward_euler(r, sigma, E, 0, 100, 0)
+    heat_S, heat_V = forward_euler(r, sigma, E, 0, 100, 0, "call")
     plt.plot(heat_S, heat_V)
 
     # backward euler solution

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import math
 
-def forward_euler(r, sigma, E, S_min, S_max, make_graph):
+def forward_euler(r, sigma, E, S_min, S_max, make_graph, option_type):
     """Convert Black Scholes to non-dimensional heat equation,
     and solve using forward Euler, following Wilmott."""
 
@@ -17,7 +17,14 @@ def forward_euler(r, sigma, E, S_min, S_max, make_graph):
     x_values = [Nminus + dx * i for i in range(x_mesh +1)]
 
     # initial condition
-    u_old = [ max(0, math.exp(-alpha * x_values[i]) * (math.exp(x_values[i]) - 1)) for i in range(x_mesh +1)]
+    #u_old = [ max(0, math.exp(-alpha * x_values[i]) * (math.exp(x_values[i]) - 1)) for i in range(x_mesh +1)]
+
+    if option_type == "call":
+        u_old = [ max(0, math.exp(-alpha * x_values[i]) * (math.exp(x_values[i]) - 1)) for i in range(x_mesh +1)]
+    if option_type == "put":
+        u_old = [ max(math.exp(-alpha * x_values[i]) * (- math.exp(x_values[i]) + 1), 0) for i in range(x_mesh +1)]
+    if option_type == "straddle":
+        u_old = [ max(math.exp(-alpha * x_values[i]) * (- math.exp(x_values[i]) + 1), math.exp(-alpha * x_values[i]) * (math.exp(x_values[i]) - 1)) for i in range(x_mesh +1)]
     u = [None for i in range(x_mesh +1)]
 
     # option to graph
@@ -29,8 +36,11 @@ def forward_euler(r, sigma, E, S_min, S_max, make_graph):
     final_time = 0.025
     timestep_count = int(final_time/dt)
     for timestep in range(timestep_count + 1):
-        u_min = 0
         tau = final_time / timestep_count * timestep
+        if option_type == "call":
+            u_min = 0
+        else:
+            u_min = math.exp(-alpha * Nminus) * math.exp(-beta * tau) * (-math.exp(Nminus) + math.exp(-2*r/sigma/sigma*tau))
         u_max = math.exp(-alpha * Nplus) * math.exp(-beta * tau) * (math.exp(Nplus) - math.exp(-2*r/sigma/sigma*tau))
         for ii in range(0, len(u)):
             if ii==0:
