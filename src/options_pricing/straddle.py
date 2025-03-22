@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from Black_Scholes_closed_form_02 import BlackScholesPutValue, BlackScholesCallValue
-from forward_euler import forward_euler
+from src.options_pricing.Black_Scholes_closed_form_02 import BlackScholesPutValue, BlackScholesCallValue
+from src.options_pricing.forward_euler import forward_euler
 
 if __name__ == '__main__':
     """Compute value of straddle exactly and using backward and forward Euler."""

@@ -1,5 +1,5 @@
 import unittest
-from volatility_smile import VolatilitySmile
+from src.options_pricing.volatility_smile import VolatilitySmile
 
 class TestVolatilitySmile(unittest.TestCase):
 

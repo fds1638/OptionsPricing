@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 from datetime import date
-import Black_Scholes_closed_form_02 as bscf
+from src.options_pricing import Black_Scholes_closed_form_02 as bscf
 from types import FunctionType
+from importlib import resources
 
 class VolatilitySmile:
     def __init__(self, ticker:int):
@@ -12,30 +13,32 @@ class VolatilitySmile:
                 "cur_date" : date(2025, 3, 19),
                 "exercise_date" : date(2025, 4, 17),
                 "current_price" : float(215.24),
-                "data_file" : "./options_chains/aapl_call_20250319_20250417",
+                "data_file" : "aapl_call_20250319_20250417",
                 "one_month_rate" : float(0.0437)
             },
             "tsla": {
                 "cur_date": date(2025, 3, 20),
                 "exercise_date": date(2025, 4, 25),
                 "current_price": float(236.26),
-                "data_file": "./options_chains/tsla_call_20250320_20250425",
+                "data_file": "tsla_call_20250320_20250425",
                 "one_month_rate": float(0.0439)
             }
         }
         self.delta = self.data[self.ticker]["exercise_date"] - self.data[self.ticker]["cur_date"]
         self.current_price = self.data[self.ticker]["current_price"]
 
-    def function_wrapper(self, f:FunctionType, **kwargs):
-        if f==bscf.BlackScholesCallValue:
+    def _function_wrapper(self, f:FunctionType, **kwargs):
+        """Allow different functions to be used in binarysearch."""
+        if f == bscf.BlackScholesCallValue:
             return f([kwargs["cur_S"]], 0, 0, kwargs["percent_of_year"], kwargs["strike_price"], kwargs["mi"], kwargs["r"])[0]
         return f(kwargs["mi"])
 
     def binarysearch(self, lo:float, hi:float, tolerance:float, search_value:float, f:FunctionType, **kwargs) -> float:
+        """Binary search for function f on interval [lo,hi] such that f(**kwargs)==search_value."""
         while hi - lo > tolerance:
             mi = 1.0 * (hi + lo) / 2.0
             kwargs["mi"] = mi
-            calced_price = self.function_wrapper(f, **kwargs)
+            calced_price = self._function_wrapper(f, **kwargs)
             if calced_price <= search_value:
                 lo = mi
             else:
@@ -43,11 +46,12 @@ class VolatilitySmile:
         return lo
 
     def func_run(self) -> None:
-
         strikes_prices = []
         min_strike = 10000000
         max_strike = 0
-        with open(self.data[self.ticker]["data_file"], "r") as f:
+
+        ref = resources.files("options_chains") / self.data[self.ticker]["data_file"]
+        with open(ref, "r") as f:
             for line in f:
                 line_array = line.strip().split()
                 strikes_prices.append((line_array[4],line_array[5]))
@@ -91,6 +95,6 @@ class VolatilitySmile:
         return
 
 if __name__=="__main__":
-    vs = VolatilitySmile("aapl")
+    vs = VolatilitySmile("tsla")
     vs.func_run()
 
