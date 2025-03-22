@@ -26,15 +26,21 @@ class VolatilitySmile:
         self.delta = self.data[self.ticker]["exercise_date"] - self.data[self.ticker]["cur_date"]
         self.current_price = self.data[self.ticker]["current_price"]
 
-    def binarysearch(self, vlo:float, vhi:float, vtolerance:float, search_value:float, f:FunctionType, **kwargs) -> float:
-        while vhi - vlo > vtolerance:
-            vmi = 1.0 * (vhi + vlo) / 2.0
-            calced_price = f([kwargs["cur_S"]], 0, 0, kwargs["percent_of_year"], kwargs["strike_price"], vmi, kwargs["r"])[0]
-            if calced_price < search_value:
-                vlo = vmi
+    def function_wrapper(self, f:FunctionType, **kwargs):
+        if f==bscf.BlackScholesCallValue:
+            return f([kwargs["cur_S"]], 0, 0, kwargs["percent_of_year"], kwargs["strike_price"], kwargs["mi"], kwargs["r"])[0]
+        return f(kwargs["mi"])
+
+    def binarysearch(self, lo:float, hi:float, tolerance:float, search_value:float, f:FunctionType, **kwargs) -> float:
+        while hi - lo > tolerance:
+            mi = 1.0 * (hi + lo) / 2.0
+            kwargs["mi"] = mi
+            calced_price = self.function_wrapper(f, **kwargs)
+            if calced_price <= search_value:
+                lo = mi
             else:
-                vhi = vmi
-        return vlo
+                hi = mi
+        return lo
 
     def func_run(self) -> None:
 
