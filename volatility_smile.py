@@ -1,15 +1,13 @@
 import matplotlib.pyplot as plt
 from datetime import date
 import Black_Scholes_closed_form_02 as bscf
+from types import FunctionType
 
 class VolatilitySmile:
     def __init__(self, ticker:int):
         self.ticker = ticker
-    def func_run(self) -> None:
-        #ticker = "tsla"
-        vtolerance = 0.0001
-
-        data = {
+        self.vtolerance = 0.0001
+        self.data = {
             "aapl": {
                 "cur_date" : date(2025, 3, 19),
                 "exercise_date" : date(2025, 4, 17),
@@ -25,14 +23,25 @@ class VolatilitySmile:
                 "one_month_rate": float(0.0439)
             }
         }
+        self.delta = self.data[self.ticker]["exercise_date"] - self.data[self.ticker]["cur_date"]
+        self.current_price = self.data[self.ticker]["current_price"]
 
-        delta = data[self.ticker]["exercise_date"] - data[self.ticker]["cur_date"]
-        current_price = data[self.ticker]["current_price"]
+    def binarysearch(self, vlo:float, vhi:float, vtolerance:float, search_value:float, f:FunctionType, **kwargs) -> float:
+        while vhi - vlo > vtolerance:
+            vmi = 1.0 * (vhi + vlo) / 2.0
+            calced_price = f([kwargs["cur_S"]], 0, 0, kwargs["percent_of_year"], kwargs["strike_price"], vmi, kwargs["r"])[0]
+            if calced_price < search_value:
+                vlo = vmi
+            else:
+                vhi = vmi
+        return vlo
+
+    def func_run(self) -> None:
 
         strikes_prices = []
         min_strike = 10000000
         max_strike = 0
-        with open(data[self.ticker]["data_file"], "r") as f:
+        with open(self.data[self.ticker]["data_file"], "r") as f:
             for line in f:
                 line_array = line.strip().split()
                 strikes_prices.append((line_array[4],line_array[5]))
@@ -47,18 +56,25 @@ class VolatilitySmile:
         strikes_in_money = []
         volatilities_in_money = []
         for s,c in strikes_prices:
-            vlo = 0.00001
-            vhi = 0.99999
-            while vhi - vlo > vtolerance:
-                vmi = 1.0*(vhi+vlo)/2.0
-                calced_price = bscf.BlackScholesCallValue([current_price], 0, 0, 1.0*delta.days/360.0, float(s), vmi, data[self.ticker]["one_month_rate"])[0]
-                if calced_price < float(c):
-                    vlo = vmi
-                else:
-                    vhi = vmi
+            # vlo = 0.00001
+            # vhi = 0.99999
+            # while vhi - vlo > vtolerance:
+            #     vmi = 1.0*(vhi+vlo)/2.0
+            #     calced_price = bscf.BlackScholesCallValue([current_price], 0, 0, 1.0*delta.days/360.0, float(s), vmi, data[self.ticker]["one_month_rate"])[0]
+            #     if calced_price < float(c):
+            #         vlo = vmi
+            #     else:
+            #         vhi = vmi
+            kwargs = {
+                "strike_price": float(s),
+                "percent_of_year" : 1.0 * self.delta.days / 360.0,
+                "cur_S" : self.current_price,
+                "r" : self.data[self.ticker]["one_month_rate"]
+            }
+            vlo = self.binarysearch(0.00001, 0.99999, self.vtolerance, float(c), bscf.BlackScholesCallValue, **kwargs)
             volatilities.append(vlo) # currently not used
             strikes.append(float(s)) # currently not used
-            if float(s) < current_price:
+            if float(s) < self.current_price:
                 volatilities_in_money.append(vlo)
                 strikes_in_money.append(float(s))
             else:
@@ -72,12 +88,12 @@ class VolatilitySmile:
         plt.ylabel("Implied Volatility")
         plt.xticks([50*i for i in range(min_strike//50, max_strike//50+2)])
         plt.title(
-            f'Implied volatility smile {self.ticker.upper()} as of {data[self.ticker]["cur_date"].strftime("%d-%b-%Y")}\nCurrent price = ${current_price}, Expiry {data[self.ticker]["exercise_date"].strftime("%d-%b-%Y")}'
+            f'Implied volatility smile {self.ticker.upper()} as of {self.data[self.ticker]["cur_date"].strftime("%d-%b-%Y")}\nCurrent price = ${self.current_price}, Expiry {self.data[self.ticker]["exercise_date"].strftime("%d-%b-%Y")}'
         )
         plt.show()
         return
 
 if __name__=="__main__":
-    vs = VolatilitySmile("tsla")
+    vs = VolatilitySmile("aapl")
     vs.func_run()
 
