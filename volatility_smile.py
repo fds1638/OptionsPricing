@@ -56,15 +56,6 @@ class VolatilitySmile:
         strikes_in_money = []
         volatilities_in_money = []
         for s,c in strikes_prices:
-            # vlo = 0.00001
-            # vhi = 0.99999
-            # while vhi - vlo > vtolerance:
-            #     vmi = 1.0*(vhi+vlo)/2.0
-            #     calced_price = bscf.BlackScholesCallValue([current_price], 0, 0, 1.0*delta.days/360.0, float(s), vmi, data[self.ticker]["one_month_rate"])[0]
-            #     if calced_price < float(c):
-            #         vlo = vmi
-            #     else:
-            #         vhi = vmi
             kwargs = {
                 "strike_price": float(s),
                 "percent_of_year" : 1.0 * self.delta.days / 360.0,
