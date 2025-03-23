@@ -25,6 +25,7 @@ if __name__=="__main__":
     for dt in dt_values:
         t, y = brownian_motion_0_to_1(dt, 0, 0.25)
         plt.plot(t.copy(), y.copy())
+    plt.title(f'Brownian motion dX = dt^0.25')
     plt.legend([f'dt {dt}' for dt in dt_values], loc="upper left")
     plt.show()
 
@@ -32,6 +33,7 @@ if __name__=="__main__":
     for dt in dt_values:
         t, y = brownian_motion_0_to_1(dt, 0, 0.75)
         plt.plot(t.copy(), y.copy())
+    plt.title(f'Brownian motion dX = dt^0.75')
     plt.legend([f'dt {dt}' for dt in dt_values], loc="upper left")
     plt.show()
 
@@ -39,5 +41,6 @@ if __name__=="__main__":
     for dt in dt_values:
         t, y = brownian_motion_0_to_1(dt, 0, 0.50)
         plt.plot(t.copy(), y.copy())
+    plt.title(f'Brownian motion dX = dt^0.50')
     plt.legend([f'dt {dt}' for dt in dt_values], loc="upper left")
     plt.show()
