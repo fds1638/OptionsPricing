@@ -34,7 +34,7 @@ class NelsonSiegelSvensson():
     #     return fmin(self._minimization_value, [self.b0, self.b1, self.b2, self.b3, self.l1, self.l2], maxiter=10000, maxfun=10000)
 
 
-
+    # Used a closure in order to be able to pass different yield_to_fit lists to _minimization_value.
     def minimize_NSS_closure(self, yield_to_fit):
         def minimize_NSS() -> list[float]:
             def _minimization_value(NSS_params: list) -> float:
