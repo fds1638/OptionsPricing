@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from scipy.optimize import fmin
 import math
+from importlib import resources
 
 class NelsonSiegelSvensson():
 
@@ -15,6 +16,15 @@ class NelsonSiegelSvensson():
     def updateNSS(self, *args):
         pass
 
+    def get_interest_rates(self):
+        return_value = []
+        ref = resources.files("interest_rates") / "yields_20250321"
+        with open(ref, "r") as f:
+            for line in f:
+                line_array = line.strip().split(",")
+                return_value.append((float(line_array[0]),float(line_array[1])))
+        return return_value
+
     def NSS(self, b0:float, b1:float, b2:float, b3:float, l1:float, l2:float, t:float) -> float:
         return (
             b0 +
@@ -22,17 +32,6 @@ class NelsonSiegelSvensson():
             b2 * ((1 - math.exp(-l1 * t)) / (l1 * t) - math.exp(-l1 * t)) +
             b3 * ((1 - math.exp(-l2 * t)) / (l2 * t) - math.exp(-l2 * t))
         )
-
-    # # not used, here to record previous attempt
-    # def _minimization_value(self, NSS_params:list, yields_to_fit:list = [(1,0.0035), (2,0.0063), (5,.0181), (10, 0.0233), (20, 0.0349)])-> float:
-    #     return sum(
-    #         (self.NSS(NSS_params[0],NSS_params[1],NSS_params[2],NSS_params[3],NSS_params[4],NSS_params[5], yields_to_fit[i][0]) - yields_to_fit[i][1])**2
-    #         for i in range(len(yields_to_fit))
-    #     )
-    # # not used, here to record previous attempt
-    # def minimize_NSS(self) -> list[float]:
-    #     return fmin(self._minimization_value, [self.b0, self.b1, self.b2, self.b3, self.l1, self.l2], maxiter=10000, maxfun=10000)
-
 
     # Used a closure in order to be able to pass different yield_to_fit lists to _minimization_value.
     def minimize_NSS_closure(self, yield_to_fit):
@@ -49,13 +48,8 @@ class NelsonSiegelSvensson():
         return minimize_NSS
 
 if __name__=="__main__":
-    # below yields 21 March 2025 from home.treasury.gov
-    yields_20250321 = [
-        (1.0/12.0,4.36),(1.5/12.0,4.33),(2.0/12.0,4.33),(3.0/12.0,4.33),(4.0/12.0,4.29),(6.0/12.0,4.26),(1.0,4.04),(2.0,3.94),(3.0,3.92),(5.0,4.00),(7.0,4.12),(10.0,4.25),(20.0,4.60),(30.0,4.59)
-    ]
-
-    # get NSS fitting to above yields
     nss = NelsonSiegelSvensson()
+    yields_20250321 = nss.get_interest_rates()     # yields 21 March 2025 from home.treasury.gov
     opt_func = nss.minimize_NSS_closure(yields_20250321)
     opt2 = opt_func()
 
