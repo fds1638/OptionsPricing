@@ -57,29 +57,7 @@ class HeathJarrowMorton():
         pass
 
 if __name__=="__main__":
-    # plot
     hjm = HeathJarrowMorton()
-
-    # yyy,aaa = hjm.get_interest_rate_curve()
-    # legend = []
-    # plt.plot([yyy[i][0] for i in range(len(yyy))], [yyy[i][1] for i in range(len(yyy))],'o-')
-    # legend.append("yields 21 March 2025")
-    # plt.plot([yyy[i][0] for i in range(len(yyy))], aaa,'o-')
-    # legend.append("closure approximation")
-    # plt.legend(legend)
-    # plt.show()
-
-    # hjm = HeathJarrowMorton()
-    # times = [t / 48 for t in range(1, 30 * 48 + 1)]
-    # forward_rates = hjm.get_forward_rate_curve(times)
-    # plt.plot(times, forward_rates, 'o-')
-    # plt.legend("times and forward rates")
-    # plt.show()
-
-    # sigma = 0.00001
-    # sigma_contribution_to_theta = lambda x: sigma * sigma * x
-    # frf = hjm.get_forward_rate_function()
-    # theta = lambda x: hjm.get_forward_rate_function() #+ sigma_contribution_to_theta
 
     sigma = 0.005
     P = lambda t: math.exp(-0.04*t)
@@ -88,11 +66,9 @@ if __name__=="__main__":
     theta = lambda x: frf
     hl = ho_lee.HoLee(theta, sigma)
 
-    print("f0(0)",f0(0))
-    print("frf(0)", (f0(0 + .1) - f0(0 )) / 0.1 )
     time_values = [i/10 for i in range(1,101)]
-    # interest_rates = hl.eval_time_T_step_dt(10, 0.1)
 
+    # do a bunch of Ho-Lee simulations
     number_of_runs = 1000
     run_results = []
     M_matrix = []
@@ -107,6 +83,7 @@ if __name__=="__main__":
             )
 
 
+    # average the simulations
     averaged_results = []
     P_graph = []
 
@@ -124,26 +101,8 @@ if __name__=="__main__":
             mn += 1
         P_graph.append(1.0*ms/mn)
 
-
-    #
-    # plt.plot(time_values, averaged_results,'o-')
-    # plt.plot(time_values, run_results[23],'o-')
-
-
-    # plt.plot(time_values, averaged_results,'o-')
-    # plt.plot(time_values, run_results[154][1:],'o-')
-    # plt.plot(time_values, run_results[454][1:],'o-')
-    # plt.plot(time_values, run_results[554][1:],'o-')
+    # plot average of simulations and show you reconstruct original P(t,T) discount curve
     plt.plot(time_values, P_graph,'o-')
     plt.plot(time_values, [math.exp(-0.04*ti/10) for ti  in range(0,100)],'o-')
-    # plt.plot(time_values, [1/M_matrix[264][ti] for ti  in range(1,101)],'o-')
-    # plt.plot(time_values, [1/M_matrix[864][ti] for ti  in range(1,101)],'o-')
-    # plt.plot(time_values, [1/M_matrix[824][ti] for ti  in range(1,101)],'o-')
-    # plt.plot(time_values, [1/M_matrix[334][ti] for ti  in range(1,101)],'o-')
-    # plt.plot(time_values, [1/M_matrix[777][ti] for ti  in range(1,101)],'o-')
     plt.legend("HJM")
     plt.show()
-
-# return lambda t: (math.log(math.exp(-0.04 * t)) - math.log(math.exp(-0.04 * t + 0.1))) / 0.1
-# return math.exp(-0.04 * t)
-#
