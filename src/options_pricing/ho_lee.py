@@ -15,7 +15,6 @@ class HoLee():
 
     def eval_time_T_step_dt(self, T: float, dt: float, r_begin: float):
         num_timesteps = int(T/dt)
-        print("num_timesteps",num_timesteps, "dt", dt)
         rng = np.random.default_rng()
         return_value = [r_begin for _ in range(num_timesteps + 1)]
         for i in range(1, num_timesteps + 1):
