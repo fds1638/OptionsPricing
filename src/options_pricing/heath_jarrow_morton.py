@@ -45,7 +45,7 @@ class HeathJarrowMorton():
         return
 
     def run_ho_lee_simulations(self, number_of_runs: int, ho_lee: ho_lee, f0: Callable):
-        """Given Ho-Lee """
+        """Given Ho-Lee and forward function f0 = f(0,T), return interest rates and size of Money account."""
         run_results_retval = []
         M_matrix_retval = []
         for _ in range(number_of_runs):
@@ -60,44 +60,45 @@ class HeathJarrowMorton():
         return run_results_retval, M_matrix_retval
 
     def average_ho_lee_simulations(self, number_of_runs, time_values, simulation_run_results, simulation_M_matrix):
+        """Average Ho-Lee results for interest rate and for Money growth."""
         averaged_results_retval = []
         P_graph_retval = []
         for i in range(len(time_values)):
             s = 0
+            ms = 0
             n = 0
             for j in range(number_of_runs):
                 s += simulation_run_results[j][i]
+                ms += 1.0 / simulation_M_matrix[j][i]
                 n += 1
             averaged_results_retval.append(1.0 * s / n)
-            ms = 0
-            mn = 0
-            for j in range(number_of_runs):
-                ms += 1.0 / simulation_M_matrix[j][i]
-                mn += 1
-            P_graph_retval.append(1.0 * ms / mn)
+            P_graph_retval.append(1.0 * ms / n)
         return averaged_results_retval, P_graph_retval
 
     def plot_graph(self, time_values, P_graph):
+        """Create plots."""
         plt.plot(time_values, P_graph, 'o-')
         plt.plot(time_values, [
             math.exp(-self.interest_rate_curve_parameters[self.interest_rate_curve]["parameters"][0] * ti * self.dt) for
             ti in range(0, 100)], 'o-')
-        plt.legend("Original", "Ho-Lee Approximation")
+        plt.legend(["Original", "Ho-Lee Approximation"])
         plt.show()
 
     def graph_exponential_example(self) -> None:
         if self.interest_rate_curve == "exponential":
+            # Get functions and parameters.
             P = lambda t: math.exp(-self.interest_rate_curve_parameters[self.interest_rate_curve]["parameters"][0] * t)
             f0 = lambda t: -(math.log(P(t + self.dt)) - math.log(P(t))) / self.dt
             frf = lambda T: (f0(T + self.dt) - f0(T - self.dt)) / (2 * self.dt) + self.sigma * self.sigma * T
             theta = lambda x: frf
-            hl = ho_lee.HoLee(theta, self.sigma)
+            # hl = ho_lee.HoLee(theta, self.sigma)
+            hl = ho_lee.HoLee.create(theta, self.sigma)
 
-            # do a bunch of Ho-Lee simulations
+            # Do a bunch of Ho-Lee simulations for interest rates and for Money value.
             number_of_runs = 1000
             run_results, M_matrix = self.run_ho_lee_simulations(number_of_runs, hl, f0)
 
-            # average the simulations
+            # Average the simulations.
             time_values = [self.dt * i for i in range(1, 101)]
             averaged_results, P_graph = self.average_ho_lee_simulations(number_of_runs, time_values, run_results, M_matrix)
 
@@ -146,6 +147,7 @@ class HeathJarrowMorton():
         pass
 
 if __name__=="__main__":
+    """Yield curve is level, exponential discount curve. Show that HJM+HL reconstructs discount curve."""
     hjm = HeathJarrowMorton()
     hjm.graph_exponential_example()
 

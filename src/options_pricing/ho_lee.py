@@ -4,9 +4,17 @@ import numpy as np
 import math
 
 class HoLee():
+    @classmethod
+    def create(cls, theta, sigma):
+        if isinstance(theta, Callable):
+            return HoLeeFunction(theta, sigma)
+        else
+            raise ValueError("Invalid argument type")
+
+class HoLeeFunction(HoLee):
     def __init__(self, theta: Callable[float,float] = lambda x : 0, sigma: float = 0.01):
         self.theta = theta
-        self.sigma = sigma
+        self.sigma = sigma # sigma is always a float
 
     def eval_float_arg(self, r0 : float, rng : Generator, dt: float):
         cur_theta = self.theta
