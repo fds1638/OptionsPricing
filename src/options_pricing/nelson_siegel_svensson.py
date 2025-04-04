@@ -81,6 +81,7 @@ if __name__=="__main__":
     yields_20250321 = nss.get_interest_rates()     # yields 21 March 2025 from home.treasury.gov
     opt_func = nss.minimize_NSS_closure(yields_20250321)
     opt2 = opt_func()
+    print(opt2)
     nss.updateNSS(opt2)
 
     # plot
