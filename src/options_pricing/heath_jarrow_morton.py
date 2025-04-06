@@ -78,10 +78,10 @@ class HeathJarrowMorton():
 
     def plot_graph(self, time_values, P_graph):
         """Create plots."""
-        plt.plot(time_values, P_graph, 'o-')
         plt.plot(time_values, [
             math.exp(-self.interest_rate_curve_parameters[self.interest_rate_curve]["parameters"][0] * ti * self.dt) for
             ti in range(0, 100)])
+        plt.plot(time_values, P_graph, '-')
         plt.legend(["Original", f"{self.short_rate_model} Approximation"])
         plt.show()
 
@@ -130,14 +130,15 @@ class HeathJarrowMorton():
 
 
     def integral_0_to_t(self, f: Callable, t: float):
-        print("t", t, "self.dt", self.dt, "int(t/(self.dt/10))", int(t/(self.dt/10)))
+        print("t", t, "self.dt", self.dt, "int(t/(self.dt/10))", int(t/(self.dt/10)), sep=" ")
         retval = sum(
-            (f(tt + 1) * (self.dt/10)) for tt in range(int(t/(self.dt/10)))
+            (f((ii + 1) * self.dt/10) * (self.dt/10)) for ii in range(int(t/(self.dt/10)))
         )
         print("retval", retval)
         return retval
 
     def graph_20250321_example(self) -> None:
+        """Use when theta of short rate model is defined by a list rather than a lambda function."""
         # Get functions and parameters.
         nss = nelson_siegel_svensson.NelsonSiegelSvensson()
         yields_20250321 = nss.get_interest_rates()  # yields 21 March 2025 from home.treasury.gov
@@ -152,7 +153,7 @@ class HeathJarrowMorton():
                          b2 * ((1 - math.exp(-l1 * t)) / (l1 * t) - math.exp(-l1 * t)) +
                          b3 * ((1 - math.exp(-l2 * t)) / (l2 * t) - math.exp(-l2 * t))
                       ) / 100 # divide by 100 to go from percent to decimal
-                     )
+        )
         #        print(opt2_func(0.0))
         time_values = [self.dt * i for i in range(1, 101)]
         opt2_vec = list(opt2_func(i * self.dt) for i in range(1,101))
@@ -161,20 +162,20 @@ class HeathJarrowMorton():
         plt.show()
         P = lambda t: math.exp(-self.integral_0_to_t(opt2_func, t))
         P_vec = list(P(i * self.dt) for i in range(0,100))
-        print("P_vec", P_vec)
+        print("P_vec", len(P_vec), P_vec)
         plt.plot(time_values, P_vec, 'o-')
         plt.legend(["P_vec"])
         plt.show()
-        f0 = lambda t: -(math.log(P(t + self.dt)) - math.log(P(t))) / self.dt
-        f0_vec = list(f0(i * self.dt) for i in range(0,100))
-        f0_vec = list(-(P_vec[i] - P_vec[i-1])/self.dt for i in range(1, len(P_vec)))
-        print("f0_vec", f0_vec)
+        #f0 = lambda t: -(math.log(P(t + self.dt)) - math.log(P(t))) / self.dt
+        #f0_vec = list(f0(i * self.dt) for i in range(0,100))
+        f0_vec = list(-(math.log(P_vec[i]) - math.log(P_vec[i-1]))/self.dt for i in range(1, len(P_vec)))
+        print("f0_vec", len(f0_vec), f0_vec)
         plt.plot(time_values[:-1], f0_vec, 'o-')
         plt.legend(["f0_vec"])
         plt.show()
         frf = lambda T: (f0(T + self.dt) - f0(T - self.dt)) / (2 * self.dt) + self.sigma * self.sigma * T
         frf_vec = list((f0_vec[i] - f0_vec[i-1])/self.dt + self.sigma * self.sigma * (i-1) * self.dt for i in range(1, len(f0_vec)))
-        print("frf_vec", frf_vec)
+        print("frf_vec", len(frf_vec), frf_vec)
         plt.plot(time_values[:-2], frf_vec, 'o-')
         plt.legend(["frf_vec"])
         plt.show()
@@ -187,7 +188,7 @@ class HeathJarrowMorton():
         M_matrix = []
         number_of_runs = 1000
         for _ in range(number_of_runs):
-            interest_rates = hl.eval_theta_list(frf_vec[0], 0.1, theta_vec)
+            interest_rates = hl.eval_theta_list(f0_vec[0], 0.1, theta_vec)
             run_results.append(interest_rates.copy())
             M_matrix.append([1])
             for rr in range(len(interest_rates.copy()[1:])):
@@ -216,7 +217,7 @@ class HeathJarrowMorton():
         return
 
         # Do a bunch of Ho-Lee simulations for interest rates and for Money savings account value.
-        run_results, M_matrix = self.run_ho_lee_simulations(self.number_of_runs, hl, f0)
+        run_results, M_matrix = self.run_simulations(self.number_of_runs, hl, f0)
 
         # Average the simulations.
         time_values = [self.dt * i for i in range(1, 101)]
@@ -300,17 +301,18 @@ class HeathJarrowMorton():
 
 if __name__=="__main__":
     """Yield curve is level, exponential discount curve. Show that HJM+HL reconstructs discount curve."""
+
+    # Ho-Lee reconstruction of
     hjm = HeathJarrowMorton()
     hjm.graph_exponential_example()
     del(hjm)
-    # hjm = HeathJarrowMorton()
-    # hjm.graph_20250321_example()
-    # del(hjm)
-    # hjm = HeathJarrowMorton()
-    # hjm.graph_exponential_example_hullwhite()
-    # del(hjm)
     hjm = HeathJarrowMorton("hull_white")
     hjm.graph_exponential_example()
+    del(hjm)
+
+    # With yield curve from 21 Mar 2025. Check various curves.
+    hjm = HeathJarrowMorton()
+    hjm.graph_20250321_example()
     del(hjm)
 
 
