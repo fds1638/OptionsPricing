@@ -82,7 +82,7 @@ class HeathJarrowMorton():
         plt.plot(time_values, [
             math.exp(-self.interest_rate_curve_parameters[self.interest_rate_curve]["parameters"][0] * ti * self.dt) for
             ti in range(0, 100)])
-        plt.legend(["Original", "Ho-Lee Approximation"])
+        plt.legend(["Original", f"{self.short_rate_model} Approximation"])
         plt.show()
 
     def graph_exponential_example(self) -> None:
