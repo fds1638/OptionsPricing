@@ -21,7 +21,6 @@ class HullWhiteFunction():
                 + self.sigma * rng.standard_normal() * math.pow(dt, 0.5)
         )
 
-
     def eval_time_T_step_dt(self, T: float, dt: float, r_begin: float):
         num_timesteps = int(T / dt)
         rng = np.random.default_rng()
@@ -29,6 +28,17 @@ class HullWhiteFunction():
         for i in range(1, num_timesteps + 1):
             return_value[i] = self.eval_float_arg(return_value[i - 1], rng, dt)
         return return_value
+
+    def eval_ZCB_price(self, t:float, T:float, a: float, P0: Callable, f0: Callable, r: Callable) -> float:
+        """Hull-White formula for P(t,T)."""
+        B = (1 - math.exp(-a * (T-t))) / a
+        A = math.exp(
+            math.log(P0(T) / P0(t))
+            + f0(t) * (T - t)
+            - 0.25 * self.sigma * self.sigma * ((math.exp(-a * T) - math.exp(-a * t))**2) * (math.exp(2 * a * t) - 1) / (a * a * a)
+        )
+        return A * math.exp(-r(t) * B)
+
 
 if __name__=="__main__":
     pass

@@ -85,6 +85,20 @@ class HeathJarrowMorton():
         plt.legend(["Original", f"{self.short_rate_model} Approximation"])
         plt.show()
 
+    def calculate_P_t_T(self, T:float, P0: Callable, f0: Callable, r: Callable, hl: ho_lee):
+        retval = []
+        for t in range(0, T + 1):
+            retval.append(
+                hl.eval_ZCB_price(t, T, P0, f0, r)
+            )
+        return retval
+
+    def plot_P_0_T(self, T, P, f0, hl):
+        zcb_vec = self.calculate_P_t_T(T, P, f0, f0, hl)
+        plt.plot(list(i for i in range(0, self.T + 1)), zcb_vec, 'o-')
+        plt.title("P(0,T) according to Ho-Lee solution formula")
+        plt.show()
+
     def graph_exponential_example(self) -> None:
         """Show reconstruction of exponential ZCB (i.e. discount) curve
         with Ho-Lee or Hull-White short term model."""
@@ -106,6 +120,9 @@ class HeathJarrowMorton():
 
             # plot average of simulations and show you reconstruct original P(t,T) discount curve
             self.plot_graph(time_values, P_graph)
+
+            # calculate and plot P(t,T) at t=0 from Ho-Lee forumla
+            self.plot_P_0_T(self.T, P, f0, hl)
 
         elif self.short_rate_model == "hull_white":
             # Get functions and parameters.

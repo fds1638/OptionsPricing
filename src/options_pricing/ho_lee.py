@@ -35,6 +35,16 @@ class HoLeeFunction(HoLee):
             return_value[i] = self.eval_float_arg(return_value[i-1], rng, dt)
         return return_value
 
+    def eval_ZCB_price(self, t:float, T:float, P0: Callable, f0: Callable, r: Callable) -> float:
+        """Ho-Lee formula for P(t,T)."""
+        A = math.exp(
+            math.log(P0(T) / P0(t))
+            + f0(t) * (T - t)
+            - 0.5 * self.sigma * self.sigma * t * (T - t) * (T - t)
+        )
+        return A * math.exp(-r(t) * (T - t))
+
+
 class HoLeeList(HoLee):
     """HoLee when theta is defined as a function."""
     def __init__(self, theta: list = [], sigma: float = 0.01):
@@ -62,6 +72,7 @@ class HoLeeList(HoLee):
         for i in range(1, num_timesteps + 1):
             return_value[i] = self.eval_float_arg(return_value[i-1], rng, dt)
         return return_value
+
 
 if __name__=="__main__":
     time_values = [i/10 for i in range(0,101)]
