@@ -145,13 +145,33 @@ class HeathJarrowMorton():
             # plot average of simulations and show you reconstruct original P(t,T) discount curve
             self.plot_graph(time_values, P_graph)
 
+            # plot single run
+            r10 = run_results[111][-1]
+            projection = []
+            P_proj = []
+            print("r10", r10)
+            for TT in range(1, 301):
+                projection.append(
+                    hw.eval_ZCB_price(10, 10 + TT/10, 1/llambda, P, f0, lambda x: r10)
+                )
+                P_proj.append(
+                    -math.log(projection[-1]) / (10 + TT/10) * 100
+                )
+            print("projection", projection)
+            print("P_proj",P_proj)
+            plt.plot(time_values, run_results[111][:-1], '-')
+            plt.plot([10 + i/10 for i in range(1, 301)], P_proj, '-')
+            plt.title("single run results")
+            plt.show()
+
+
 
     def integral_0_to_t(self, f: Callable, t: float):
-        print("t", t, "self.dt", self.dt, "int(t/(self.dt/10))", int(t/(self.dt/10)), sep=" ")
+        # print("t", t, "self.dt", self.dt, "int(t/(self.dt/10))", int(t/(self.dt/10)), sep=" ")
         retval = sum(
             (f((ii + 1) * self.dt/10) * (self.dt/10)) for ii in range(int(t/(self.dt/10)))
         )
-        print("retval", retval)
+        # print("retval", retval)
         return retval
 
     def graph_20250321_example(self) -> None:
