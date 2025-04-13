@@ -31,16 +31,16 @@ class HullWhiteFunction():
 
     def eval_ZCB_price(self, t:float, T:float, a: float, P0: Callable, f0: Callable, r: Callable) -> float:
         """Hull-White formula for P(t,T)."""
-        B = (1 - math.exp(-a * (T-t))) / a
+        B = (1 - math.exp(-1/a * (T-t))) / a
         A = math.exp(
             math.log(P0(T) / P0(t))
-            + f0(t) * (T - t)
-            - 0.25 * self.sigma * self.sigma * ((math.exp(-a * T) - math.exp(-a * t))**2) * (math.exp(2 * a * t) - 1) / (a * a * a)
+            + f0(t) * B
+            - 0.25 * self.sigma * self.sigma * ((math.exp(-1/a * T) - math.exp(-1/a * t))**2) * (math.exp(2 * 1/a * t) - 1) / (1/a * 1/a * 1/a)
         )
-        print(A, B, -r(t), A * math.exp(-r(t) * B))
+        # print(A, B, -r(t), A * math.exp(-r(t) * B))
         return A * math.exp(-r(t) * B)
 
-    def eval_ZCB_price_a(self, t:float, T:float, a: float, P0: Callable, f0: Callable, r: Callable) -> float:
+    def eval_ZCB_price_old_2(self, t:float, T:float, a: float, P0: Callable, f0: Callable, r: Callable) -> float:
         """Hull-White formula for P(t,T)."""
         B = (1 - math.exp(-a * (T-t))) / a
         A = math.exp(

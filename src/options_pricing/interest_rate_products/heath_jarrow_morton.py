@@ -50,7 +50,7 @@ class HeathJarrowMorton():
         run_results_retval = []
         M_matrix_retval = []
         for _ in range(number_of_runs):
-            interest_rates = short_rate_model.eval_time_T_step_dt(10, 0.1, f0(0))
+            interest_rates = short_rate_model.eval_time_T_step_dt(self.T, self.dt, f0(0))
             run_results_retval.append(interest_rates.copy())
             M_matrix_retval.append([1])
             for rr in range(len(interest_rates.copy()[1:])):
@@ -80,7 +80,7 @@ class HeathJarrowMorton():
         """Create plots."""
         plt.plot(time_values, [
             math.exp(-self.interest_rate_curve_parameters[self.interest_rate_curve]["parameters"][0] * ti * self.dt) for
-            ti in range(0, 100)])
+            ti in range(0, int(self.T/self.dt))])
         plt.plot(time_values, P_graph, '-')
         plt.legend(["Original", f"{self.short_rate_model} Approximation"])
         plt.show()
@@ -93,10 +93,10 @@ class HeathJarrowMorton():
             )
         return retval
 
-    def plot_P_0_T(self, T, P, f0, hl):
-        zcb_vec = self.calculate_P_t_T(T, P, f0, f0, hl)
+    def plot_P_0_T(self, T, P, f0, short_rate):
+        zcb_vec = self.calculate_P_t_T(T, P, f0, f0, short_rate)
         plt.plot(list(i for i in range(0, self.T + 1)), zcb_vec, 'o-')
-        plt.title("P(0,T) according to Ho-Lee solution formula")
+        plt.title(f"P(0,T) according to {self.short_rate_model} solution formula")
         plt.show()
 
     def graph_exponential_example(self) -> None:
@@ -135,6 +135,25 @@ class HeathJarrowMorton():
             hw = hull_white.HullWhiteFunction(theta, llambda, self.sigma)
             # hl = hull_white.Hu.create(theta, self.sigma)
 
+            ttimes = list(i * self.dt    for i in range(0, int(self.T/self.dt) + 1))
+            Pinitvec = list(P(i * self.dt) for i in range(0, int(self.T/self.dt) + 1))
+            finitvec = list(f0(i * self.dt) for i in range(0, int(self.T/self.dt) + 1))
+            print("ttimes",ttimes)
+            print("Pinitvec",Pinitvec)
+            print("finitvec",finitvec)
+            plt.plot(
+                ttimes,
+                Pinitvec, '-')
+            plt.title(f"P(0,T) initial")
+            plt.show()
+
+            plt.plot(
+                ttimes,
+                finitvec, '-')
+            plt.title(f"f0(0,T) initial")
+            plt.ylim(0, 0.1)
+            plt.show()
+
             # Do a bunch of Ho-Lee simulations for interest rates and for Money savings account value.
             run_results, M_matrix = self.run_simulations(self.number_of_runs, hw, f0)
 
@@ -143,25 +162,27 @@ class HeathJarrowMorton():
             averaged_results, P_graph = self.average_simulations(self.number_of_runs, time_values, run_results, M_matrix)
 
             # plot average of simulations and show you reconstruct original P(t,T) discount curve
+            print("P_graph", P_graph)
             self.plot_graph(time_values, P_graph)
 
             # plot single run
-            for run_choice in [111,222,333,444,555]:
-                r10 = run_results[run_choice][-1]
+            for run_choice in [(123,"g"),(234,"b"),(555,"r")]:
+                r10 = run_results[run_choice[0]][-1]
                 projection = []
                 P_proj = []
                 print("r10", r10)
-                for TT in range(0, 301):
+                for TT in range(1, 301):
                     projection.append(
-                        hw.eval_ZCB_price(10, 10 + TT/10, 1/llambda, P, f0, lambda x: r10)
+                        # hw.eval_ZCB_price(0, TT/10, 1/llambda, P, f0, lambda x: f0(0))
+                        hw.eval_ZCB_price(10, 10 + TT / 10, 1 / llambda, P, f0, lambda x: r10)
                     )
                     P_proj.append(
-                        -math.log(projection[-1]) / (10 + TT/10) * 100 + r10
+                        -math.log(projection[-1]) / (max(TT/10,.1))
                     )
                 print("projection", projection)
                 print("P_proj",P_proj)
-                plt.plot(time_values, run_results[run_choice][:-1].copy(), '-')
-                plt.plot([10 + i/10 for i in range(0, 301)], P_proj.copy(), '-')
+                plt.plot(time_values, run_results[run_choice[0]][:-1].copy(), '-', color=run_choice[1])
+                plt.plot([10 + i/10 for i in range(1, 301)], P_proj.copy(), '-', color=run_choice[1])
             plt.title("single run results")
             plt.show()
 
@@ -270,16 +291,16 @@ if __name__=="__main__":
     """Yield curve is level, exponential discount curve. Show that HJM+HL reconstructs discount curve."""
 
     # Ho-Lee reconstruction of
-    hjm = HeathJarrowMorton()
-    hjm.graph_exponential_example()
-    del(hjm)
+    # hjm = HeathJarrowMorton()
+    # hjm.graph_exponential_example()
+    # del(hjm)
     hjm = HeathJarrowMorton("hull_white")
     hjm.graph_exponential_example()
     del(hjm)
 
     # With yield curve from 21 Mar 2025. Check various curves.
-    hjm = HeathJarrowMorton()
-    hjm.graph_20250321_example()
-    del(hjm)
+    # hjm = HeathJarrowMorton()
+    # hjm.graph_20250321_example()
+    # del(hjm)
 
 
