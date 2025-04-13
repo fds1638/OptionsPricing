@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
 import math
-import nelson_siegel_svensson
-import ho_lee
-import hull_white
+from src.options_pricing.interest_rate_products import ho_lee, hull_white, nelson_siegel_svensson
 from typing import Callable
 
 class HeathJarrowMorton():

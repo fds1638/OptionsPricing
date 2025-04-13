@@ -146,21 +146,22 @@ class HeathJarrowMorton():
             self.plot_graph(time_values, P_graph)
 
             # plot single run
-            r10 = run_results[111][-1]
-            projection = []
-            P_proj = []
-            print("r10", r10)
-            for TT in range(1, 301):
-                projection.append(
-                    hw.eval_ZCB_price(10, 10 + TT/10, 1/llambda, P, f0, lambda x: r10)
-                )
-                P_proj.append(
-                    -math.log(projection[-1]) / (10 + TT/10) * 100
-                )
-            print("projection", projection)
-            print("P_proj",P_proj)
-            plt.plot(time_values, run_results[111][:-1], '-')
-            plt.plot([10 + i/10 for i in range(1, 301)], P_proj, '-')
+            for run_choice in [111,222,333,444,555]:
+                r10 = run_results[run_choice][-1]
+                projection = []
+                P_proj = []
+                print("r10", r10)
+                for TT in range(0, 301):
+                    projection.append(
+                        hw.eval_ZCB_price(10, 10 + TT/10, 1/llambda, P, f0, lambda x: r10)
+                    )
+                    P_proj.append(
+                        -math.log(projection[-1]) / (10 + TT/10) * 100 + r10
+                    )
+                print("projection", projection)
+                print("P_proj",P_proj)
+                plt.plot(time_values, run_results[run_choice][:-1].copy(), '-')
+                plt.plot([10 + i/10 for i in range(0, 301)], P_proj.copy(), '-')
             plt.title("single run results")
             plt.show()
 

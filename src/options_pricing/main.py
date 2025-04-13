@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from Black_Scholes_closed_form_02 import BlackScholesCallValue
-from forward_euler import forward_euler
+from src.options_pricing.generalities.Black_Scholes_closed_form_02 import BlackScholesCallValue
+from src.options_pricing.generalities.forward_euler import forward_euler
 from implicit import backward_euler
-from greeks import delta
-from binomial import get_binary_value
+from src.options_pricing.generalities.binomial import get_binary_value
 
 if __name__ == '__main__':
     # stock and option parameters

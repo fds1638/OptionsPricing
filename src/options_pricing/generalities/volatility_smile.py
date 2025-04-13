@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from datetime import date
-from src.options_pricing import Black_Scholes_closed_form_02 as bscf
+from src.options_pricing.generalities import Black_Scholes_closed_form_02 as bscf
 from types import FunctionType
 from importlib import resources
 
