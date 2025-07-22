@@ -4,7 +4,11 @@ import nelson_siegel_svensson
 import ho_lee
 import hull_white
 from typing import Callable
+from enum import Enum
 
+class SwapOptionType(Enum):
+    RCVR = 1.0
+    PYER = -1.0
 class HeathJarrowMorton():
     def __init__(self, short_rate_model: str = "ho_lee", interest_rate_curve: str = "exponential"):
         self.short_rate_model = short_rate_model
@@ -170,12 +174,15 @@ class HeathJarrowMorton():
                 r10 = run_results[run_choice[0]][-1]
                 projection = []
                 P_proj = []
-                print("r10", r10)
                 for TT in range(1, 301):
                     projection.append(
                         # hw.eval_ZCB_price(0, TT/10, 1/llambda, P, f0, lambda x: f0(0))
-                        hw.eval_ZCB_price(10, 10 + TT / 10, 1 / llambda, P, f0, lambda x: r10)
-                    )
+                        # below best works
+                        #hw.eval_ZCB_price(10, 10 + TT / 10, 1 / llambda, P, f0, lambda x: r10)
+                        # below try just like book
+                        hw.eval_ZCB_price(10, 10 + TT / 10, llambda, P, f0, lambda x: r10, frf)
+
+                        )
                     P_proj.append(
                         -math.log(projection[-1]) / (max(TT/10,.1))
                     )
@@ -186,7 +193,33 @@ class HeathJarrowMorton():
             plt.title("single run results")
             plt.show()
 
+            K_vec = []
+            Swap_vec = []
+            HW_swap_vec = []
+            notional = 1000
+            for K_index in range(-10, 50 + 1):
+                K_val = K_index/100
+                K_vec.append(K_val)
+                Swap_vec.append(
+                    self.swap_price(11, 30, P, K_val, SwapOptionType.RCVR) * notional
+                )
+                HW_swap_vec.append(
+                    self.swap_price_hw(11, 30, hw.eval_ZCB_price, K_val, SwapOptionType.RCVR, llambda, P, f0, r10, frf) * notional
+                )
+            plt.plot(K_vec, Swap_vec,"--o")
+            plt.plot(K_vec, HW_swap_vec,"--o")
+            plt.title("Swap Price\n(should be equal need to fix HW ZCB calc)")
+            plt.show()
 
+    def swap_price(self, t_begin: float, t_end: float, zcb: Callable, K: float, swap_type: SwapOptionType) -> float:
+        fixed_rate_sum = sum(zcb(ti) for ti in (t_begin, t_end + 1)) # annual swap payments for simplicity for now
+        return swap_type.value * ((zcb(t_begin) - zcb(t_end)) - K * fixed_rate_sum)
+
+    def swap_price_hw(self, t_begin: float, t_end: float, zcb: Callable, K: float, swap_type: SwapOptionType, llambda: float, P, f0, r10, frf) -> float:
+        fixed_rate_sum = sum(zcb(10, ti, 1 / llambda, P, f0, lambda x: r10, frf) for ti in (t_begin, t_end + 1)) # annual swap payments for simplicity for now
+        ZCB_begin = zcb(10, t_begin, 1 / llambda, P, f0, lambda x: r10, frf)
+        ZCB_end = zcb(10, t_end, 1 / llambda, P, f0, lambda x: r10, frf)
+        return swap_type.value * ((ZCB_begin - ZCB_end) - K * fixed_rate_sum)
 
     def integral_0_to_t(self, f: Callable, t: float):
         # print("t", t, "self.dt", self.dt, "int(t/(self.dt/10))", int(t/(self.dt/10)), sep=" ")

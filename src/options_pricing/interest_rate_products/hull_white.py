@@ -29,7 +29,22 @@ class HullWhiteFunction():
             return_value[i] = self.eval_float_arg(return_value[i - 1], rng, dt)
         return return_value
 
-    def eval_ZCB_price(self, t:float, T:float, a: float, P0: Callable, f0: Callable, r: Callable) -> float:
+    def eval_ZCB_price(self, t:float, T:float, llambda: float, P0: Callable, f0: Callable, r: Callable, frf: Callable) -> float:
+        """Hull-White formula for P(t,T)."""
+        tau = T - t
+        ttheta = lambda x: 1 / llambda * frf(x) + f0(x) + self.sigma * self.sigma * (
+                    1 - math.exp(-2 * llambda * x)) / (2 * llambda * llambda)
+        B_func = lambda tau: -(math.exp(-llambda * tau) - 1) * 1.0 / llambda
+        temp1 = llambda * sum(B_func(i*tau/100) * ttheta(T - i*tau/100) * (tau/100) for i in range(1,101))
+        temp2 = (
+                self.sigma * self.sigma / (4.0 * llambda * llambda * llambda)
+                * (math.exp(-2.0*llambda*tau)*(4.0*math.exp(llambda*tau)-1.0)-3.0)
+                + self.sigma * self.sigma * tau / (2.0 * llambda * llambda)
+        )
+        return_value = math.exp(temp1 + temp2)
+        return return_value
+
+    def eval_ZCB_price_works(self, t:float, T:float, a: float, P0: Callable, f0: Callable, r: Callable) -> float:
         """Hull-White formula for P(t,T)."""
         B = (1 - math.exp(-1/a * (T-t))) / a
         A = math.exp(
