@@ -1,8 +1,8 @@
 from fredapi import Fred
-import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 import math
+from plot_handler import PlotHandler
 
 class VasicekDiscrete():
     """
@@ -52,11 +52,12 @@ class VasicekDiscrete():
         vasicek_equilibrium_values = [vasicek_b for _ in range(len(deltas.index) + len(vasicek_dates))]
 
         # Plot
-        plt.plot(deltas.index, lagged.values)
-        plt.plot(vasicek_dates, vasicek_predictions)
-        plt.plot(vasicek_equilibrium_dates, vasicek_equilibrium_values, linestyle='--')
-        plt.legend(["FRED 30-year rates", "Vasicek prediction", "Vasicek equilibrium"])
-        plt.show()
+        plots = {}
+        plots["FRED 30-year rates"] = (deltas.index, lagged.values)
+        plots["Vasicek prediction"] = (vasicek_dates, vasicek_predictions)
+        plots["Vasicek equilibrium"] = (vasicek_equilibrium_dates, vasicek_equilibrium_values)
+        plothandler = PlotHandler()
+        plothandler.make_plots(plots)
 
 if __name__=="__main__":
     vasicek = VasicekDiscrete()

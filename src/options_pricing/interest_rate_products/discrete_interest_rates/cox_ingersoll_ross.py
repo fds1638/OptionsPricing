@@ -1,8 +1,8 @@
 from fredapi import Fred
-import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 import math
+from plot_handler import PlotHandler
 
 class CoxIngersollRossDiscrete():
     """
@@ -56,13 +56,13 @@ class CoxIngersollRossDiscrete():
         c_i_s_equilibrium_dates = deltas.index.to_list() + c_i_s_dates
         c_i_s_equilibrium_values = [c_i_s_b for _ in range(len(deltas.index) + len(c_i_s_dates))]
 
-        print(c_i_s_a, c_i_s_b, model.coef_, model.intercept_)
         # Plot
-        plt.plot(filtered.index, filtered.values)
-        plt.plot(c_i_s_dates, c_i_s_predictions)
-        plt.plot(c_i_s_equilibrium_dates, c_i_s_equilibrium_values, linestyle='--')
-        plt.legend(["FRED 30-year rates", "CoxIngersollRoss prediction", "CoxIngersollRoss equilibrium"])
-        plt.show()
+        plots = {}
+        plots["FRED 30-year rates"] = (filtered.index, filtered.values)
+        plots["CoxIngersollRoss prediction"] = (c_i_s_dates, c_i_s_predictions)
+        plots["CoxIngersollRoss equilibrium"] = (c_i_s_equilibrium_dates, c_i_s_equilibrium_values)
+        plothandler = PlotHandler()
+        plothandler.make_plots(plots)
 
 if __name__=="__main__":
     c_i_r = CoxIngersollRossDiscrete()
