@@ -3,6 +3,8 @@ from sklearn.linear_model import LinearRegression
 import pandas as pd
 import math
 from plot_handler import PlotHandler
+from data_model import Validator
+
 
 class VasicekDiscrete():
     """
@@ -35,8 +37,11 @@ class VasicekDiscrete():
         lagged = filtered.shift(1)[1:]
 
         # Reshape data and do linear regression fit.
-        X = lagged.to_frame()
-        y = deltas.to_frame()
+        X = lagged.to_frame('lagged_values')
+        y = deltas.to_frame('delta_values')
+        # Validate here rather than earlier because packages work with pandas DataFrames better than with Series.
+        Validator.validate_lagged_series(X)
+        Validator.validate_delta_series(y)
         model = LinearRegression()
         model.fit(X, y)
 

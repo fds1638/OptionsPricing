@@ -3,6 +3,7 @@ from sklearn.linear_model import LinearRegression
 import pandas as pd
 import math
 from plot_handler import PlotHandler
+from data_model import Validator
 
 class CoxIngersollRossDiscrete():
     """
@@ -40,8 +41,11 @@ class CoxIngersollRossDiscrete():
 
 
         # Reshape data and do linear regression fit.
-        X = pd.DataFrame({'Col1': lagged, 'Col2': cnstnt})
-        y = deltas.to_frame()
+        X = pd.DataFrame({'lagged_values': lagged, 'constant_values': cnstnt})
+        y = deltas.to_frame('delta_values')
+        # Validate here rather than earlier because packages work with pandas DataFrames better than with Series.
+        Validator.validate_c_i_r_X(X)
+        Validator.validate_delta_series(y)
         model = LinearRegression(fit_intercept=False) # in C-I-R the cnstnt functions as the intercept
         model.fit(X, y)
 
