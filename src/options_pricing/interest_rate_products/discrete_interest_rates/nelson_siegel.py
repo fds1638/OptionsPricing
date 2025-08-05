@@ -33,14 +33,26 @@ class NelsonSiegel():
         bond_prices = np.array([98.50,97.16,93.97,90.91,91.19,84.91,84.09,79.97,77.06,107.97])
         coupons = np.array([0.750,0.125,0.625,0.125,0.375,0.125,0.500,0.375,0.250,4.250])
 
-        llambda = 10
+        best_fit_error = 1000000000000000
+        for llambda_mult_10 in range(1,101):
+            test_lambda = llambda_mult_10/10
+            res = scipy.optimize.minimize(lambda coeffs: self.objective_function(coupons, bond_prices, test_lambda, *coeffs), x0 = np.zeros(3))
+            least_squares_error = self.objective_function(coupons, bond_prices, test_lambda, res.x[0], res.x[1], res.x[2])
+            if least_squares_error < best_fit_error:
+                best_fit_error = least_squares_error
+                llambda = test_lambda
+                beta0 = res.x[0]
+                beta1 = res.x[1]
+                beta2 = res.x[2]
 
-        res = scipy.optimize.minimize(lambda coeffs: self.objective_function(coupons, bond_prices, llambda, *coeffs), x0 = np.zeros(3))
-        print("res", res.x)
+        print("Best fit params:")
+        print("llambda", llambda)
+        print("beta0", beta0)
+        print("beta1", beta1)
+        print("beta2", beta2)
+        print("best_fit_error", best_fit_error)
+        print()
 
-        beta0 = res.x[0]
-        beta1 = res.x[1]
-        beta2 = res.x[2]
 
 
         print("value", self.value(beta0, beta1, beta2, llambda, 1, coupons))
