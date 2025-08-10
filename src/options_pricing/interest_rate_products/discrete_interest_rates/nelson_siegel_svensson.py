@@ -1,7 +1,7 @@
 import math
 import numpy as np
 import scipy
-from plot_handler import PlotHandler
+from src.options_pricing.interest_rate_products.discrete_interest_rates.plot_handler import PlotHandler
 
 class NelsonSiegelSvensson():
 
@@ -15,10 +15,6 @@ class NelsonSiegelSvensson():
                 + b2 * ((1 - math.exp(-ll * t)) / (ll * t) - math.exp(-ll * t))
                 + b3 * ((1 - math.exp(-mu * t)) / (mu * t) - math.exp(-mu * t))
         )
-        #try:
-        #    return b0 + b1 * ((1 - math.exp(-ll*t))/(ll*t)) + b2 * ((1 - math.exp(-ll*t))/(ll*t) - math.exp(-ll*t)) + b3 * ((1 - math.exp(-mu*t))/(mu*t) - math.exp(-mu*t))
-        #except Exception as e:
-        #    print("Exception:", e, mu, t)
 
     def bondyield(self, b0, b1, b2, ll, t, b3, mu):
         return self.nelson_siegel_svensson(b0, b1, b2, ll, t, b3, mu)
