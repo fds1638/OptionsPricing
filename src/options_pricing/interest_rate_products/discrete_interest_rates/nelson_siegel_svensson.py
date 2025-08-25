@@ -22,8 +22,7 @@ class NelsonSiegelSvensson():
     def value(self, b0, b1, b2, ll, t, coupons, b3, mu, pp=False):
         t_index = t - 1
         by = self.bondyield(b0, b1, b2, ll, t, b3, mu)
-        # return 100 / math.pow(1+ by, t) + np.sum([coupons[t_index]/math.pow(1+by, tt) for tt in range(1, t+1)])
-        yields = [self.bondyield(b0, b1, b2, ll, tt, b3, mu) for tt in range(1, t+1)]
+            yields = [self.bondyield(b0, b1, b2, ll, tt, b3, mu) for tt in range(1, t+1)]
         if pp:
             print("yields", yields)
             for ttt in range(1,t+1):

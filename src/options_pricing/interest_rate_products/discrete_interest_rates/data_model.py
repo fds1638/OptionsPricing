@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from pandantic import Pandantic
 
 class LaggedSeries(BaseModel):
@@ -10,6 +10,10 @@ class DeltaSeries(BaseModel):
 class CoxIngersollRossX(BaseModel):
     lagged_values: float
     constant_values: float
+
+class NelsonSiegelModel(BaseModel):
+    bond_prices_list: list[float]
+    coupons_list: list[float]
 
 class Validator():
 
@@ -27,3 +31,6 @@ class Validator():
     def validate_c_i_r_X(df, err="raise"):
         c_i_r_validator = Pandantic(CoxIngersollRossX)
         c_i_r_validator.validate(dataframe=df, errors=err)
+
+    def validate_ns_bond_price_list(bpl, err="raise"):
+        pass

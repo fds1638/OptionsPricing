@@ -2,6 +2,7 @@ import math
 import numpy as np
 import scipy
 from plot_handler import PlotHandler
+from data_model import NelsonSiegelModel, ValidationError
 
 class NelsonSiegel():
 
@@ -30,8 +31,18 @@ class NelsonSiegel():
 
 
     def run_example(self):
-        bond_prices = np.array([98.50,97.16,93.97,90.91,91.19,84.91,84.09,79.97,77.06,107.97])
-        coupons = np.array([0.750,0.125,0.625,0.125,0.375,0.125,0.500,0.375,0.250,4.250])
+        input_data = {
+            "bond_prices_list": [98.50, 97.16, 93.97, 90.91, 91.19, 84.91, 84.09, 79.97, 77.06, 107.97],
+            "coupons_list": [0.750, 0.125, 0.625, 0.125, 0.375, 0.125, 0.500, 0.375, 0.250, 4.250]
+        }
+        try:
+            validated_data = NelsonSiegelModel(**input_data)
+            print("validated_data", validated_data.model_dump())
+        except ValidationError as e:
+            print(e)
+
+        bond_prices = np.array(validated_data.bond_prices_list)
+        coupons = np.array(validated_data.coupons_list)
 
         best_fit_error = 1000000000000000
         for llambda_mult_10 in range(1,101):
